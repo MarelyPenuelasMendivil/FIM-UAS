@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registrar Usuario</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f1f5f9;
+    font-family:'Segoe UI',sans-serif;
+}
+
+.sidebar{
+    width:260px;
+    min-width:260px;
+    max-width:260px;
+    background:#0f172a;
+    min-height:100vh;
+    color:#fff;
+}
+
+.sidebar a{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 20px;
+    color:#cbd5f5;
+    text-decoration:none;
+    transition:0.3s;
+}
+
+.sidebar a:hover{
+    background:#1e293b;
+    color:#fff;
+}
+
+.header{
+    background:#fff;
+    padding:15px 25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.card-box{
+    background:#fff;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.06);
+}
+
+.logout-btn{
+    border:none;
+    background:#ef4444;
+    color:#fff;
+    padding:8px 14px;
+    border-radius:10px;
+    transition:0.3s;
+}
+
+.logout-btn:hover{
+    background:#dc2626;
+    transform:scale(1.05);
+}
+
+label{
+    font-weight:500;
+    margin-bottom:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="d-flex">
+<div class="sidebar flex-shrink-0">
+    <div class="p-3 text-center border-bottom">
+        <img src="iconogris.png" width="70">
+        <h6 class="mt-2">Sistema Préstamos</h6>
+        <small id="rolSidebar"></small>
+    </div>
+
+    <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="usuarioAdmin.html"><i class="bi bi-people-fill"></i> Usuarios</a>
+    <a href="equipos.html"><i class="bi bi-hdd-stack"></i> Equipos</a>
+    <a href="lista_solicitudes.html"><i class="bi bi-box-arrow-in-down"></i> Préstamos</a>
+    <a href="reportes.html"><i class="bi bi-graph-up"></i> Reportes</a>
+    <a href="advertencias.html"><i class="bi bi-exclamation-triangle"></i> Advertencias</a>
+</div>
+
+<div class="flex-grow-1">
+
+<div class="header">
+    <div>
+        <h6 class="mb-0">Facultad de Ingeniería Mochis</h6>
+        <small>Universidad Autónoma de Sinaloa</small>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+        <img src="logo_fim.png" width="55">
+        <button class="logout-btn" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i>
+        </button>
+    </div>
+</div>
+
+<div class="p-4">
+
+<h4 class="fw-bold mb-4">
+     <button class="btn btn-secondary" onclick="regresar()">
+        <i class="bi bi-arrow-left"></i> Regresar
+    </button>
+    Registrar Usuario
+       
+
+</h4>
+
+<div class="card-box">
+
+<form onsubmit="return guardarUsuario()">
+
+<div class="row g-3">
+
+<div class="col-md-6">
+<label>Nombre</label>
+<input class="form-control" id="nombre" required>
+</div>
+
+<div class="col-md-6">
+<label>Correo</label>
+<input class="form-control" id="correo" required>
+</div>
+
+<div class="col-md-6">
+<label>No. Cuenta</label>
+<input class="form-control" id="numeroCuenta" required>
+</div>
+
+<div class="col-md-6">
+<label>Contraseña</label>
+<input type="password" class="form-control" id="password" required>
+</div>
+
+<div class="col-md-6">
+<label>Carrera</label>
+<select class="form-select" id="carrera"></select>
+</div>
+
+<div class="col-md-6">
+<label>Grupo</label>
+<select class="form-select" id="grupo"></select>
+</div>
+
+<div class="col-md-6">
+<label>Rol</label>
+<select class="form-select" id="rol"></select>
+</div>
+
+</div>
+
+<div class="mt-4 text-end">
+<button class="btn btn-primary">
+<i class="bi bi-save"></i> Guardar
+</button>
+</div>
+
+</form>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+const API="http://localhost:5193";
+
+function logout(){
+    localStorage.clear();
+    location.href="index.html";
+}
+
+async function cargarCombos(){
+    try{
+        const carreras = await (await fetch(`${API}/api/carreras`)).json();
+        const grupos = await (await fetch(`${API}/api/grupos`)).json();
+        const roles = await (await fetch(`${API}/api/roles`)).json();
+
+        let c=document.getElementById("carrera");
+        let g=document.getElementById("grupo");
+        let r=document.getElementById("rol");
+
+        c.innerHTML=`<option value="">Selecciona carrera</option>`;
+        g.innerHTML=`<option value="">Selecciona grupo</option>`;
+        r.innerHTML=`<option value="">Selecciona rol</option>`;
+
+        carreras.forEach(x=>{
+            c.innerHTML+=`<option value="${x.idCarrera}">${x.nombre}</option>`;
+        });
+
+        grupos.forEach(x=>{
+            g.innerHTML+=`<option value="${x.idGrupo}">
+                ${x.grado} - ${x.grupo} (${x.codigo ?? ""})
+            </option>`;
+        });
+
+        roles.forEach(x=>{
+            r.innerHTML+=`<option value="${x.idRol}">${x.nombre}</option>`;
+        });
+
+    }catch(e){
+        alert("Error cargando combos");
+    }
+}
+
+async function guardarUsuario(){
+
+    const idRol = parseInt(document.getElementById("rol").value);
+    const idCarrera = parseInt(document.getElementById("carrera").value);
+    const idGrupo = parseInt(document.getElementById("grupo").value);
+
+    if(!idRol || !idCarrera || !idGrupo){
+        alert("Selecciona todos los campos");
+        return false;
+    }
+
+    const data={
+        nombre:document.getElementById("nombre").value.trim(),
+        correo:document.getElementById("correo").value.trim(),
+        numeroCuenta:document.getElementById("numeroCuenta").value.trim(),
+        password:document.getElementById("password").value.trim(),
+        idRol:idRol,
+        idCarrera:idCarrera,
+        idGrupo:idGrupo
+    };
+
+    try{
+        let res=await fetch(`${API}/api/usuarios`,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify(data)
+        });
+
+        let json=await res.json();
+
+        if(json.mensaje==="Usuario creado correctamente"){
+            alert("Usuario guardado");
+            location.href="usuarioAdmin.html";
+        }else{
+            alert(json.mensaje || "Error al guardar");
+        }
+
+    }catch(e){
+        alert("Error conexión");
+    }
+
+    return false;
+}
+
+document.getElementById("rolSidebar").innerText=
+    localStorage.getItem("rol")||"Administrador";
+
+cargarCombos();
+
+function regresar(){
+    window.history.back();
+}
+</script>
+
+</body>
+</html>

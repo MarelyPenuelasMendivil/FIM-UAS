@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sistema de Préstamos FIM</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f4f6f9;
+}
+
+.login-card{
+    max-width:420px;
+    margin:auto;
+}
+
+.logo{
+    width:100px;
+}
+</style>
+
+</head>
+
+<body class="d-flex align-items-center vh-100">
+
+<div class="container">
+
+<div class="card shadow p-4 login-card">
+
+<div class="text-center mb-3">
+<img src="icono.png" class="logo">
+</div>
+
+<h5 class="text-center text-primary mb-4">
+Sistema de Préstamo de Equipos
+</h5>
+
+<form id="formLogin">
+
+<div class="mb-3">
+<label class="form-label">Número de cuenta</label>
+<input id="cuenta" type="text" class="form-control" placeholder="Ej. 1234567" required>
+</div>
+
+<div class="mb-3">
+<label class="form-label">Contraseña</label>
+<input id="password" type="password" class="form-control" placeholder="Ingrese su contraseña" required>
+</div>
+
+<div class="mb-3 form-check">
+<input type="checkbox" class="form-check-input" id="remember">
+<label class="form-check-label">Mantener sesión abierta</label>
+</div>
+
+<button type="submit" class="btn btn-primary w-100">
+Iniciar sesión
+</button>
+
+<div class="text-center mt-3">
+<a href="recuperar.html">¿Olvidaste tu contraseña?</a>
+</div>
+
+</form>
+
+<hr>
+
+<p class="text-center text-muted small">
+Facultad de Ingeniería Mochis<br>
+Universidad Autónoma de Sinaloa
+</p>
+
+</div>
+
+</div>
+
+<script>
+
+document.getElementById("formLogin").addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const cuenta = document.getElementById("cuenta").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    try {
+
+        const res = await fetch("http://127.0.0.1:5193/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ cuenta, password })
+        });
+
+        const data = await res.json();
+
+        console.log("LOGIN RESPONSE:", data);
+
+        if (!data.success) {
+            alert("❌ Usuario o contraseña incorrectos");
+            return;
+        }
+
+        if (!data.usuario || !data.usuario.id) {
+            alert("❌ Error en datos del usuario");
+            return;
+        }
+
+        const usuario = {
+            id: data.usuario.id,
+            nombre: data.usuario.nombre,
+            numeroCuenta: data.usuario.numeroCuenta,
+            rolId: data.usuario.rolId,   
+            rol: data.usuario.rol,
+            foto: data.usuario.foto || null
+        };
+
+        localStorage.setItem("usuario", JSON.stringify(usuario));
+
+        if (document.getElementById("remember").checked) {
+            localStorage.setItem("sesionActiva", "true");
+        }
+
+        console.log("USUARIO GUARDADO:", usuario);
+
+        switch (usuario.rolId) {
+
+            case 1:
+                window.location.href = "dashboard.html"; 
+                break;
+
+            case 2:
+                window.location.href = "dashboard-encargado.html"; 
+                break;
+
+            case 3:
+                window.location.href = "dashboard-usuarioNormal.html"; 
+                break;
+
+            case 5:
+                window.location.href = "dashboard-usuarioNormal.html"; // Alumno
+                break;
+            default:
+                alert("❌ Rol no reconocido");
+                break;
+        }
+
+    } catch (error) {
+        console.error("ERROR LOGIN:", error);
+        alert("❌ No se pudo conectar con la API");
+    }
+
+});
+
+</script>
+
+</body>
+</html>

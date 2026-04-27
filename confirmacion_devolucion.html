@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confirmación de Devolución - Sistema de Préstamos</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body { background: #f4f6f9; }
+
+.header-top {
+    background: #fff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.sidebar {
+    background: #343a40;
+    min-height: 100vh;
+    color: #fff;
+}
+
+.sidebar a {
+    display: flex;
+    padding: 12px 20px;
+    color: #fff;
+    text-decoration: none;
+}
+
+.sidebar a:hover { background: #495057; }
+
+.main-content { padding: 20px; }
+
+.container-box {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-info img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.confirmation-box {
+    text-align: center;
+    padding: 30px;
+    border: 2px dashed #28a745;
+    border-radius: 12px;
+    background: #e6f8ed;
+}
+</style>
+</head>
+
+<body>
+
+<div class="d-flex">
+
+    <div class="sidebar flex-shrink-0">
+        <div class="p-3 text-center border-bottom">
+            <img src="iconogris.png" style="width:70px;">
+            <h6>Sistema de Préstamos</h6>
+            <small>Administrador</small>
+        </div>
+
+       <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="usuarioAdmin.html"><i class="bi bi-people-fill"></i> Usuarios</a>
+        <a href="equipos.html"><i class="bi bi-hdd-stack"></i> Equipos</a>
+        <a href="lista_solicitudes.html"><i class="bi bi-box-arrow-in-down"></i> Préstamos</a>
+        <a href="reportes.html"><i class="bi bi-graph-up"></i> Reportes</a>
+        <a href="advertencias.html"><i class="bi bi-exclamation-triangle"></i> Advertencias</a>
+    </div>
+
+    <div class="flex-grow-1">
+
+        <div class="header-top">
+            <div>
+                <h6 class="mb-0">Facultad de Ingeniería Mochis</h6>
+                <small>Universidad Autónoma de Sinaloa</small>
+            </div>
+            <img src="logo_fim.png" alt="Logo FIM">
+        </div>
+
+        <div class="main-content">
+
+            <div class="container-box">
+
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <strong>Usuario:</strong>
+                        <div id="usuario">Juan Pérez</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <strong>Equipo:</strong>
+                        <div id="equipo">Laptop HP</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <strong>Estado del equipo:</strong>
+                        <span id="estado" class="badge bg-success">Devuelto</span>
+                    </div>
+
+                    <div class="col-md-4 mt-3">
+                        <strong>Fecha y hora de devolución:</strong>
+                        <div id="fechaDevolucion">22/03/2026 14:00</div>
+                    </div>
+
+                    <div class="col-md-8 mt-3">
+                        <strong>Observaciones:</strong>
+                        <p id="observaciones">Equipo devuelto en buen estado.</p>
+                    </div>
+                </div>
+
+                <div class="confirmation-box mb-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3 text-success">¡Devolución registrada con éxito!</h4>
+                    <p>El sistema ha actualizado automáticamente el estado del equipo.</p>
+                </div>
+
+                <div class="d-flex justify-content-end">
+    <a href="prestamos_activos.html" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Regresar a préstamos activos
+    </a>
+</div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

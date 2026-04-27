@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detalle del Equipo</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f1f5f9;
+    font-family:'Segoe UI',sans-serif;
+}
+
+.sidebar{
+    width:260px;
+    min-width:260px;
+    background:#0f172a;
+    min-height:100vh;
+    color:#fff;
+}
+
+.sidebar a{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 20px;
+    color:#cbd5f5;
+    text-decoration:none;
+    transition:.3s;
+}
+
+.sidebar a:hover{
+    background:#1e293b;
+    color:#fff;
+}
+
+.header{
+    background:#fff;
+    padding:15px 25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.card-box{
+    background:#fff;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.06);
+}
+
+.logout-btn{
+    border:none;
+    background:#ef4444;
+    color:#fff;
+    padding:8px 14px;
+    border-radius:10px;
+}
+
+.logout-btn:hover{
+    background:#dc2626;
+}
+</style>
+</head>
+
+<body>
+
+<div class="d-flex">
+
+<div class="sidebar">
+    <div class="p-3 text-center border-bottom">
+        <img src="iconogris.png" width="70">
+        <h6 class="mt-2">Sistema Préstamos</h6>
+        <small id="rolSidebar"></small>
+    </div>
+
+    <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="usuarioAdmin.html"><i class="bi bi-people-fill"></i> Usuarios</a>
+    <a href="equipos.html"><i class="bi bi-hdd-stack"></i> Equipos</a>
+    <a href="lista_solicitudes.html"><i class="bi bi-box-arrow-in-down"></i> Préstamos</a>
+    <a href="reportes.html"><i class="bi bi-graph-up"></i> Reportes</a>
+    <a href="advertencias.html"><i class="bi bi-exclamation-triangle"></i> Advertencias</a>
+</div>
+
+<div class="flex-grow-1">
+
+<div class="header">
+    <div>
+        <h6 class="mb-0">Facultad de Ingeniería Mochis</h6>
+        <small>Universidad Autónoma de Sinaloa</small>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+        <img src="logo_fim.png" width="55">
+        <button class="logout-btn" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i>
+        </button>
+    </div>
+</div>
+
+<div class="p-4">
+
+<a href="equipos.html" class="btn btn-secondary mb-3">
+    <i class="bi bi-arrow-left"></i> Regresar
+</a>
+
+<div class="card-box">
+
+<div class="d-flex justify-content-between mb-3">
+    <h4 id="nombreEquipo" class="text-primary fw-bold"></h4>
+    <span id="estadoEquipo" class="badge"></span>
+</div>
+
+<p><b>Categoría:</b> <span id="categoria"></span></p>
+<p><b>Serie:</b> <span id="serie"></span></p>
+<p><b>RFID:</b> <span id="rfid"></span></p>
+<p><b>Ubicación:</b> <span id="ubicacion"></span></p>
+<p><b>Tipo uso:</b> <span id="tipoUso"></span></p>
+<p><b>Descripción:</b> <span id="descripcion"></span></p>
+
+<div class="d-flex gap-2 mt-3">
+
+<button class="btn btn-success" onclick="cambiarEstado('Prestado')">
+<i class="bi bi-box-arrow-up"></i> Prestar
+</button>
+
+<button class="btn btn-warning" onclick="cambiarEstado('Mantenimiento')">
+<i class="bi bi-tools"></i> Mantenimiento
+</button>
+
+<button class="btn btn-secondary" onclick="devolver()">
+<i class="bi bi-box-arrow-in-down"></i> Devolver
+</button>
+
+</div>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+const API="http://localhost:5193";
+
+function logout(){
+    localStorage.clear();
+    location.href="index.html";
+}
+
+document.getElementById("rolSidebar").innerText=
+localStorage.getItem("rol")||"Administrador";
+
+let idEquipo=new URLSearchParams(window.location.search).get("id");
+
+if(!idEquipo){
+    location.href="equipos.html";
+}
+
+async function cargarDetalle(){
+    try{
+        let res=await fetch(`${API}/api/equipos/${idEquipo}`);
+        let e=await res.json();
+
+        document.getElementById("nombreEquipo").innerText=e.nombre||"";
+        document.getElementById("categoria").innerText=e.categoria||"-";
+        document.getElementById("serie").innerText=e.numeroSerie||"-";
+        document.getElementById("rfid").innerText=e.rfid||"-";
+        document.getElementById("ubicacion").innerText=e.laboratorio||"Sin ubicación";
+        document.getElementById("descripcion").innerText=e.descripcion||"-";
+        document.getElementById("tipoUso").innerText=e.tipoUso||"-";
+
+        let badge=document.getElementById("estadoEquipo");
+        badge.innerText=e.estado||"";
+
+        badge.className="badge";
+
+        if(e.estado==="Disponible") badge.classList.add("bg-success");
+        else if(e.estado==="Prestado") badge.classList.add("bg-danger");
+        else if(e.estado==="Mantenimiento") badge.classList.add("bg-warning","text-dark");
+        else badge.classList.add("bg-secondary");
+
+    }catch{
+        alert("Error cargando equipo");
+    }
+}
+async function cambiarEstado(estado){
+    try{
+        let res = await fetch(`${API}/api/equipos/${idEquipo}/estado`,{
+            method:"PUT",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({estado})
+        });
+
+        if(!res.ok){
+            let err = await res.text();
+            alert("Error: " + err);
+            return;
+        }
+
+        alert("Estado actualizado");
+        cargarDetalle();
+
+    }catch{
+        alert("Error conexión");
+    }
+}
+async function devolver(){
+    try{
+        await fetch(`${API}/api/equipos/devolver/${idEquipo}`,{
+            method:"POST"
+        });
+
+        cargarDetalle();
+    }catch{
+        alert("Error");
+    }
+}
+
+cargarDetalle();
+</script>
+
+</body>
+</html>

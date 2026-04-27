@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfil - Sistema de Préstamos FIM</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body { background:#f4f6f9; }
+.container-box {
+    background:#fff;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 6px rgba(0,0,0,.1);
+}
+.profile-img {
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    object-fit:cover;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container py-4">
+
+<div class="row">
+
+<!-- PERFIL -->
+<div class="col-md-4">
+<div class="container-box text-center">
+
+<img id="fotoPerfil" class="profile-img mb-3" src="usuario.jpg">
+
+<h5 id="nombrePerfil"></h5>
+<p id="rolPerfil"></p>
+
+<input type="file" id="inputFoto" class="d-none" accept="image/*">
+<button class="btn btn-outline-primary btn-sm"
+onclick="document.getElementById('inputFoto').click()">
+Cambiar foto
+</button>
+
+<hr>
+
+<p><b>Matrícula:</b> <span id="cuentaPerfil"></span></p>
+
+</div>
+</div>
+
+<!-- FORM -->
+<div class="col-md-8">
+<div class="container-box">
+
+<form id="formPerfil">
+
+<div class="mb-3">
+<label>Nombre</label>
+<input id="nombreInput" class="form-control">
+</div>
+
+<div class="mb-3">
+<label>Correo</label>
+<input id="correoInput" class="form-control">
+</div>
+
+<div class="mb-3">
+<label>Nueva contraseña (opcional)</label>
+<input id="passInput" type="password" class="form-control">
+</div>
+
+<button class="btn btn-primary">
+Guardar cambios
+</button>
+
+</form>
+
+</div>
+</div>
+
+</div>
+</div>
+
+<script>
+
+const API = "http://127.0.0.1:5193/api";
+
+let usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if(!usuario){
+    location.href = "login.html";
+}
+
+function cargar(){
+    document.getElementById("nombrePerfil").innerText = usuario.nombre;
+    document.getElementById("rolPerfil").innerText = usuario.rol;
+    document.getElementById("cuentaPerfil").innerText = usuario.numeroCuenta;
+
+    document.getElementById("nombreInput").value = usuario.nombre;
+    document.getElementById("correoInput").value = usuario.correo;
+
+    if(usuario.foto){
+        document.getElementById("fotoPerfil").src =
+        "data:image/png;base64," + usuario.foto;
+    }
+}
+cargar();
+
+/* FOTO */
+document.getElementById("inputFoto").addEventListener("change", async (e)=>{
+const file = e.target.files[0];
+if(!file) return;
+
+const form = new FormData();
+form.append("foto", file);
+
+const res = await fetch(`${API}/usuarios/${usuario.id}/foto`, {
+method:"POST",
+body:form
+});
+
+if(res.ok){
+const base64 = await toBase64(file);
+document.getElementById("fotoPerfil").src = base64;
+
+usuario.foto = base64.split(",")[1];
+localStorage.setItem("usuario", JSON.stringify(usuario));
+}
+});
+
+function toBase64(file){
+return new Promise((res,rej)=>{
+const r = new FileReader();
+r.onload = ()=>res(r.result);
+r.readAsDataURL(file);
+});
+}
+
+/* PERFIL */
+document.getElementById("formPerfil").addEventListener("submit", async (e)=>{
+e.preventDefault();
+
+const data = {
+nombre: document.getElementById("nombreInput").value,
+correo: document.getElementById("correoInput").value
+};
+
+const pass = document.getElementById("passInput").value;
+if(pass) data.password = pass;
+
+const res = await fetch(`${API}/usuarios/${usuario.id}/perfil`, {
+method:"PUT",
+headers:{ "Content-Type":"application/json" },
+body: JSON.stringify(data)
+});
+
+if(res.ok){
+usuario.nombre = data.nombre;
+usuario.correo = data.correo;
+
+localStorage.setItem("usuario", JSON.stringify(usuario));
+
+alert("Perfil actualizado correctamente");
+cargar();
+}else{
+alert("Error al actualizar");
+}
+});
+
+</script>
+
+</body>
+</html>

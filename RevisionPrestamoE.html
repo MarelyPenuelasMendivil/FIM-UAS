@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revisión de Solicitud</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+
+body{
+    background:#f4f6f9;
+    font-family:'Segoe UI', sans-serif;
+}
+
+.sidebar{
+    width:260px;
+    background:#0f172a;
+    min-height:100vh;
+    color:#fff;
+}
+
+.sidebar a{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 18px;
+    color:#cbd5e1;
+    text-decoration:none;
+}
+
+.sidebar a:hover{
+    background:#1e293b;
+    color:#fff;
+}
+
+.header{
+    background:#fff;
+    padding:12px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+.container-box{
+    background:#fff;
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+.section-title{
+    font-weight:600;
+    margin-bottom:12px;
+}
+
+.info-label{
+    font-size:13px;
+    color:#6c757d;
+}
+
+.info-value{
+    font-weight:600;
+}
+
+.user-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.user-box img{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+</style>
+</head>
+
+<body onload="init()">
+
+<div class="d-flex">
+
+<div class="sidebar">
+
+    <div class="p-3 text-center border-bottom">
+        <img src="iconogris.png" width="65">
+        <h6>Sistema Préstamos</h6>
+        <small>Encargado</small>
+    </div>
+
+    <a href="dashboard-encargado.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="equipos-encargado.html"><i class="bi bi-hdd-stack"></i> Equipos</a>
+    <a href="registrar_prestamoE.html"><i class="bi bi-box-arrow-in-down"></i> Préstamo</a>
+    <a href="registrar_devolucionE.html"><i class="bi bi-arrow-return-left"></i> Devolución</a>
+    <a href="historial_PrestamosE.html"><i class="bi bi-clock-history"></i> Historial</a>
+    <a href="perfilE.html"><i class="bi bi-person-circle"></i> Perfil</a>
+
+</div>
+
+<div class="flex-grow-1">
+
+<div class="header">
+
+    <div>
+        <h6 class="mb-0">Facultad de Ingeniería Mochis</h6>
+        <small>Universidad Autónoma de Sinaloa</small>
+    </div>
+
+    <div class="user-box">
+        <span id="nombreUser">Encargado</span>
+        <img id="fotoUser" src="usuario.jpg">
+    </div>
+
+</div>
+
+<div class="p-4">
+
+<div class="container-box mb-4">
+
+<div class="section-title"><i class="bi bi-person"></i> Datos del Usuario</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="info-label">Nombre</div>
+        <div class="info-value" id="usuario">---</div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="info-label">Correo</div>
+        <div class="info-value" id="correo">---</div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="info-label">Carrera</div>
+        <div class="info-value" id="carrera">---</div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="info-label">Advertencias</div>
+        <div class="info-value" id="advertencias">---</div>
+    </div>
+</div>
+
+</div>
+
+<div class="container-box mb-4">
+
+<div class="section-title"><i class="bi bi-laptop"></i> Equipo</div>
+
+<div class="row g-3">
+
+    <div class="col-md-6">
+        <div class="info-label">Equipo</div>
+        <div class="info-value" id="equipo">---</div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="info-label">Categoría</div>
+        <div class="info-value" id="categoria">---</div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="info-label">Ubicación</div>
+        <div class="info-value" id="ubicacion">---</div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="info-label">Estado</div>
+        <span class="badge bg-success" id="estadoEquipo">---</span>
+    </div>
+
+</div>
+
+</div>
+
+<div class="container-box mb-4">
+
+<div class="section-title"><i class="bi bi-calendar-check"></i> Solicitud</div>
+
+<div class="row g-3">
+
+    <div class="col-md-6">
+        <div class="info-label">Fecha solicitud</div>
+        <div class="info-value" id="fechaSolicitud">---</div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="info-label">Fecha devolución</div>
+        <div class="info-value" id="fechaDevolucion">---</div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="info-label">Motivo</div>
+        <div class="info-value" id="motivo">---</div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="info-label">Estado</div>
+        <span class="badge" id="estadoSolicitud">---</span>
+    </div>
+
+</div>
+
+</div>
+
+<div class="d-flex gap-3">
+
+<button class="btn btn-success" id="btnAprobar" onclick="cambiarEstado('Aprobada')">
+Aprobar
+</button>
+
+<button class="btn btn-danger" id="btnRechazar" onclick="cambiarEstado('Rechazada')">
+Rechazar
+</button>
+
+<a href="javascript:history.back()" class="btn btn-secondary">
+Regresar
+</a>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+
+const API="http://localhost:5193/api/solicitudes";
+const id=new URLSearchParams(window.location.search).get("id");
+
+let usuarioSesion=JSON.parse(localStorage.getItem("usuario"));
+
+function init(){
+
+    if(!usuarioSesion){
+        alert("No hay sesión iniciada");
+        window.location.href="login.html";
+        return;
+    }
+
+    document.getElementById("nombreUser").innerText=usuarioSesion.nombre||"Encargado";
+    if(usuarioSesion.foto){
+        document.getElementById("fotoUser").src="data:image/png;base64,"+usuarioSesion.foto;
+    }
+
+    cargar();
+}
+
+async function cargar(){
+
+    if(!id) return;
+
+    let res=await fetch(`${API}/${id}`);
+    let data=await res.json();
+
+    document.getElementById("usuario").innerText=data.usuario||"N/A";
+    document.getElementById("correo").innerText=data.correo||"N/A";
+    document.getElementById("carrera").innerText=data.carrera||"N/A";
+    document.getElementById("advertencias").innerText=data.advertencias||"Ninguna";
+
+    document.getElementById("equipo").innerText=data.equipo||"N/A";
+    document.getElementById("categoria").innerText=data.categoria||"N/A";
+    document.getElementById("ubicacion").innerText=data.ubicacion||"N/A";
+
+    document.getElementById("fechaSolicitud").innerText=data.fechaSolicitud||"N/A";
+    document.getElementById("fechaDevolucion").innerText=data.fechaFin||"N/A";
+    document.getElementById("motivo").innerText=data.motivo||"N/A";
+
+    let badge=document.getElementById("estadoSolicitud");
+    badge.innerText=data.estado||"N/A";
+
+    if(data.estado==="Aprobada"){
+        badge.className="badge bg-success";
+        bloquear();
+    }else if(data.estado==="Pendiente"){
+        badge.className="badge bg-warning text-dark";
+    }else{
+        badge.className="badge bg-danger";
+    }
+}
+
+function bloquear(){
+    document.getElementById("btnAprobar").disabled=true;
+    document.getElementById("btnRechazar").disabled=true;
+}
+
+async function cambiarEstado(estado){
+
+    if(!confirm("Confirmar acción")) return;
+
+    await fetch(`${API}/${id}/estado`,{
+        method:"PUT",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({ estado })
+    });
+
+    cargar();
+}
+
+</script>
+
+</body>
+</html>

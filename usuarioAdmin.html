@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usuarios</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f1f5f9;
+    font-family:'Segoe UI',sans-serif;
+}
+
+.sidebar{
+    width:260px;
+    background:#0f172a;
+    min-height:100vh;
+    color:#fff;
+}
+
+.sidebar a{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 20px;
+    color:#cbd5f5;
+    text-decoration:none;
+    transition:0.3s;
+}
+
+.sidebar a:hover{
+    background:#1e293b;
+    color:#fff;
+}
+
+.header{
+    background:#fff;
+    padding:15px 25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.container-box{
+    background:#fff;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.06);
+}
+
+.logout-btn{
+    border:none;
+    background:#ef4444;
+    color:#fff;
+    padding:8px 14px;
+    border-radius:10px;
+    transition:0.3s;
+}
+
+.logout-btn:hover{
+    background:#dc2626;
+}
+
+.badge-neutral{
+    background:#e5e7eb;
+    color:#374151;
+    font-weight:500;
+}
+</style>
+</head>
+
+<body>
+
+<div class="d-flex">
+
+<div class="sidebar">
+    <div class="p-3 text-center border-bottom">
+        <img src="iconogris.png" width="70">
+        <h6 class="mt-2">Sistema Préstamos</h6>
+        <small id="rolSidebar"></small>
+    </div>
+
+    <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="usuarioAdmin.html"><i class="bi bi-people-fill"></i> Usuarios</a>
+    <a href="equipos.html"><i class="bi bi-hdd-stack"></i> Equipos</a>
+    <a href="lista_solicitudes.html"><i class="bi bi-box-arrow-in-down"></i> Préstamos</a>
+    <a href="reportes.html"><i class="bi bi-graph-up"></i> Reportes</a>
+    <a href="advertencias.html"><i class="bi bi-exclamation-triangle"></i> Advertencias</a>
+</div>
+
+<div class="flex-grow-1">
+
+<div class="header">
+    <div>
+        <h6 class="mb-0">Facultad de Ingeniería Mochis</h6>
+        <small>Universidad Autónoma de Sinaloa</small>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+        <img src="logo_fim.png" width="55">
+        <button class="logout-btn" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i>
+        </button>
+    </div>
+</div>
+
+<div class="p-4">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold mb-0">Usuarios</h4>
+
+    <a href="registrar_usuario.html" class="btn btn-primary">
+        <i class="bi bi-person-plus"></i> Nuevo
+    </a>
+</div>
+
+<div class="container-box">
+
+<table class="table align-middle">
+<thead>
+<tr>
+<th>Nombre</th>
+<th>Correo</th>
+<th>Rol</th>
+<th>Estado</th>
+<th>Advertencias</th>
+<th>Acciones</th>
+</tr>
+</thead>
+
+<tbody id="tablaUsuarios"></tbody>
+
+</table>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+const API="http://localhost:5193";
+
+function logout(){
+    localStorage.clear();
+    location.href="index.html";
+}
+
+async function cargarUsuarios(){
+    try{
+        let data=await (await fetch(`${API}/api/usuarios`)).json();
+
+        let tabla=document.getElementById("tablaUsuarios");
+        tabla.innerHTML="";
+
+        data.forEach(u=>{
+
+            let estado=u.activo
+                ? `<span class="badge bg-success">Activo</span>`
+                : `<span class="badge bg-danger">Inactivo</span>`;
+
+            tabla.innerHTML+=`
+            <tr>
+                <td>${u.nombre}</td>
+                <td>${u.correo}</td>
+                <td><span class="badge badge-neutral">${u.rol}</span></td>
+                <td>${estado}</td>
+                <td><span class="badge badge-neutral">${u.advertencias ?? 0}</span></td>
+                <td>
+                    <a href="perfil_usuario.html?id=${u.id}" class="text-info me-2">
+                        <i class="bi bi-eye"></i>
+                    </a>
+
+                    <a href="editar_usuario.html?id=${u.id}" class="text-warning me-2">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+
+                    <a href="#" onclick="eliminar(${u.id})" class="text-danger">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>`;
+        });
+
+    }catch(e){
+        alert("Error cargando usuarios");
+    }
+}
+
+async function eliminar(id){
+    if(!confirm("¿Eliminar usuario?")) return;
+
+    let res=await fetch(`${API}/api/usuarios/${id}`,{
+        method:"DELETE"
+    });
+
+    if(res.ok){
+        cargarUsuarios();
+    }else{
+        alert("Error al eliminar");
+    }
+}
+
+document.getElementById("rolSidebar").innerText=
+    localStorage.getItem("rol")||"Administrador";
+
+cargarUsuarios();
+setInterval(cargarUsuarios,10000);
+</script>
+
+</body>
+</html>

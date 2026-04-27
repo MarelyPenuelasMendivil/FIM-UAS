@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Préstamos por Vencer</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body { background:#f4f6f9; }
+
+/* HEADER */
+.header-top{
+    background:#fff;
+    padding:10px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:250px;
+    background:#343a40;
+    min-height:100vh;
+    color:#fff;
+}
+
+.sidebar a{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 20px;
+    color:#fff;
+    text-decoration:none;
+}
+
+.sidebar a:hover{
+    background:#495057;
+}
+
+/* MAIN */
+.main-content{
+    padding:20px;
+    width:100%;
+}
+
+/* CARD */
+.container-box{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.user-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.user-box img{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="d-flex">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="p-3 text-center border-bottom">
+        <img src="iconogris.png" style="width:70px;">
+        <h6>Sistema de Préstamos</h6>
+        <small>Encargado</small>
+    </div>
+
+    <a href="dashboard-encargado.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="equiposE.html"><i class="bi bi-hdd-stack"></i> Equipos disponibles</a>
+    <a href="registrar_prestamoE.html"><i class="bi bi-box-arrow-in-down"></i> Registrar préstamo</a>
+    <a href="registrar_devolucionE.html"><i class="bi bi-arrow-return-left"></i> Registrar devolución</a>
+    <a href="historial_PrestamosE.html"><i class="bi bi-clock-history"></i> Historial</a>
+    <a href="perfilE.html"><i class="bi bi-person-circle"></i> Perfil</a>
+</div>
+
+<!-- CONTENIDO -->
+<div class="flex-grow-1">
+
+<!-- HEADER -->
+<div class="header-top">
+
+    <div>
+        <h6 class="mb-0">Facultad de Ingeniería Mochis</h6>
+        <small>Universidad Autónoma de Sinaloa</small>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+        <div class="user-box">
+            <span id="nombreUser">Usuario</span>
+            <img src="usuario.jpg" id="fotoUser">
+        </div>
+
+        <!-- BOTÓN REGRESAR -->
+        <a href="dashboard-encargado.html" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+    </div>
+
+</div>
+
+<div class="main-content">
+
+<h3 class="text-primary fw-bold mb-4">
+    <i class="bi bi-clock-fill"></i> Préstamos por vencer
+</h3>
+
+<div class="mb-3">
+    <input type="text" class="form-control" placeholder="Buscar..." onkeyup="filtrarTabla()">
+</div>
+
+<div class="container-box">
+
+<div class="table-responsive">
+<table class="table table-hover align-middle">
+
+<thead class="table-light">
+<tr>
+    <th>Alumno</th>
+    <th>Equipo</th>
+    <th>Fecha préstamo</th>
+    <th>Fecha devolución</th>
+    <th>Estado</th>
+</tr>
+</thead>
+
+<tbody id="tabla"></tbody>
+
+</table>
+</div>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+const API = "http://localhost:5193";
+async function cargarPorVencer(){
+    try{
+        let res = await fetch(`${API}/api/prestamos/porvencer`);
+        let data = await res.json();
+
+        let tabla = document.getElementById("tabla");
+        tabla.innerHTML = "";
+
+        data.forEach(p => {
+
+            tabla.innerHTML += `
+            <tr>
+                <td>${p.usuario}</td>
+                <td>${p.equipo}</td>
+                <td>${new Date(p.fechaPrestamo).toLocaleString()}</td>
+                <td>${new Date(p.fechaDevolucion).toLocaleString()}</td>
+            </tr>`;
+        });
+
+    }catch(e){
+        console.log(e);
+        alert("Error cargando datos");
+    }
+}
+
+cargarPorVencer();
+
+</script>
+
+</body>
+</html>

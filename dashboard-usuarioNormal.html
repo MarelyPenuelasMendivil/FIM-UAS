@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Usuario</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f4f6f9;
+    font-family:'Segoe UI', sans-serif;
+}
+
+.sidebar{
+    width:260px;
+    background:#0f172a;
+    min-height:100vh;
+    color:#fff;
+}
+
+.sidebar a{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 18px;
+    color:#cbd5e1;
+    text-decoration:none;
+    transition:.2s;
+}
+
+.sidebar a:hover{
+    background:#1e293b;
+    color:#fff;
+}
+
+.header{
+    background:#fff;
+    padding:12px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+.user-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.user-box img{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.card-ui{
+    border-radius:14px;
+    padding:20px;
+    text-align:center;
+    transition:.2s;
+}
+
+.card-ui:hover{
+    transform:translateY(-5px);
+}
+
+.alert-box{
+    border-radius:10px;
+}
+@media (max-width: 768px){
+    .sidebar{
+        position: fixed;
+        left: -260px;
+        top: 0;
+        z-index: 1000;
+        transition: .3s;
+    }
+
+    .sidebar.active{
+        left: 0;
+    }
+
+    .header{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .user-box{
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+</style>
+</head>
+
+<body onload="init()">
+
+<div class="d-flex">
+
+<div class="sidebar">
+
+    <div class="p-3 text-center border-bottom">
+        <img src="iconogris.png" width="65">
+        <h6>Sistema Préstamos</h6>
+        <small>Alumno</small>
+    </div>
+
+    <a href="dashboard-usuario.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="mis_prestamos.html"><i class="bi bi-box-arrow-in-down"></i> Mis préstamos</a>
+    <a href="solicitarPrestamo.html"><i class="bi bi-plus-circle"></i> Solicitar préstamo</a>
+    <a href="Historial_prestamos.html"><i class="bi bi-clock-history"></i> Historial</a>
+    <a href="perfil_configuracion.html"><i class="bi bi-person"></i> Perfil</a>
+</div>
+
+<div class="flex-grow-1">
+
+<div class="header">
+
+    <div>
+        <h6 class="mb-0">Facultad de Ingeniería Mochis</h6>
+        <small>Universidad Autónoma de Sinaloa</small>
+    </div>
+
+    <div class="user-box">
+        <div class="text-end">
+            <div class="fw-bold" id="nombreUsuario"></div>
+            <small id="numeroCuenta"></small>
+        </div>
+        <img id="fotoUsuario" src="usuario.jpg">
+        <button class="btn btn-danger btn-sm" onclick="logout()">
+            <i class="bi bi-box-arrow-right"></i>
+        </button>
+    </div>
+
+</div>
+
+<div class="p-4">
+
+<h4 class="text-primary mb-4">
+<i class="bi bi-speedometer2"></i> Mi Panel
+</h4>
+
+<div class="row g-4 mb-4">
+
+<div class="col-md-4">
+<div class="card shadow card-ui">
+<i class="bi bi-box-arrow-in-down text-primary fs-2"></i>
+<h4 id="prestamosActivos">0</h4>
+<p class="mb-0">Préstamos activos</p>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card shadow card-ui">
+<i class="bi bi-clock text-warning fs-2"></i>
+<h4 id="solicitudesPendientes">0</h4>
+<p class="mb-0">Solicitudes pendientes</p>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card shadow card-ui">
+<i class="bi bi-exclamation-triangle text-danger fs-2"></i>
+<h4 id="alertas">0</h4>
+<p class="mb-0">Alertas</p>
+</div>
+</div>
+
+</div>
+
+<div id="contenedorAlertas"></div>
+
+</div>
+</div>
+</div>
+
+<script>
+
+const API="http://localhost:5193/api";
+let usuario;
+
+function init(){
+
+    usuario = JSON.parse(localStorage.getItem("usuario"));
+
+    if(!usuario){
+        location.href="login.html";
+        return;
+    }
+
+    document.getElementById("nombreUsuario").innerText = usuario.nombre || "";
+    document.getElementById("numeroCuenta").innerText = usuario.numeroCuenta || "";
+
+    if(usuario.foto){
+        document.getElementById("fotoUsuario").src = "data:image/png;base64," + usuario.foto;
+    }
+
+    cargarTodo();
+}
+
+async function cargarTodo(){
+    await Promise.all([
+        cargarPrestamos(),
+        cargarSolicitudes(),
+        cargarAlertas()
+    ]);
+}
+
+async function cargarPrestamos(){
+    let res = await fetch(`${API}/prestamos`);
+    let data = await res.json();
+
+    let activos = data.filter(p =>
+        p.usuarioId == usuario.id &&
+        p.estado === "Activo"
+    ).length;
+
+    document.getElementById("prestamosActivos").innerText = activos;
+}
+
+async function cargarSolicitudes(){
+    let res = await fetch(`${API}/solicitudes`);
+    let data = await res.json();
+
+    let pendientes = data.filter(s =>
+        s.numeroCuenta == usuario.numeroCuenta &&
+        s.estado === "Pendiente"
+    ).length;
+
+    document.getElementById("solicitudesPendientes").innerText = pendientes;
+}
+
+async function cargarAlertas(){
+    let res = await fetch(`${API}/prestamos/alertas`);
+    let data = await res.json();
+
+    let contenedor = document.getElementById("contenedorAlertas");
+    contenedor.innerHTML = "";
+
+    let count = 0;
+
+    data.forEach(a => {
+
+        let color = "info";
+        if(a.alerta.includes("CRÍTICO")) color = "danger";
+        else if(a.alerta.includes("URGENTE")) color = "warning";
+
+        let div = document.createElement("div");
+        div.className = `alert alert-${color} alert-box`;
+
+        let fecha = new Date(a.fecha).toLocaleString();
+
+        div.innerHTML = `
+            <strong>${a.equipo}</strong><br>
+            ${a.alerta}<br>
+            <small>${fecha}</small>
+        `;
+
+        contenedor.appendChild(div);
+        count++;
+    });
+
+    document.getElementById("alertas").innerText = count;
+}
+
+function logout(){
+    localStorage.clear();
+    location.href="login.html";
+}
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
